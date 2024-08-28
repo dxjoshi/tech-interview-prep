@@ -15,7 +15,7 @@ Everything you need for acing software engineering interviews—coding, system d
 | [SQL](#sql)                              | SQL query writing, optimization, and best practices |
 | [High-Level Design](#hld)          | Architecture and design principles for large systems |
 | [AWS Concepts](#aws-concepts)            | Introduction to Amazon Web Services and key cloud concepts |
-| [CS Fundamentals - CN, OS, DBMS](#cs-fundamentals) | Core computer science concepts including Computer Networks, Operating Systems, and Database Management Systems |
+| [CS Fundamentals](#cs-fundamentals) | Core computer science concepts including Computer Networks, Operating Systems, and Database Management Systems |
 | [Behavioral Interview](#behavioral-interview) | Strategies for effective behavioral interviews |
 | [Asking Good Questions](#asking-good-questions) | Techniques for framing and asking insightful questions |
 | [Leadership Skills](#leadership-skills)  | Building and demonstrating leadership in tech roles |
@@ -209,7 +209,7 @@ Everything you need for acing software engineering interviews—coding, system d
 
 ---
 
-## CS Fundamentals - CN, OS, DBMS
+## CS Fundamentals
 
 ### Resources
 
