@@ -194,7 +194,6 @@ Everything you need for acing software engineering interviews—coding, system d
 ### Resources
 
 | **YouTube Links** | **Blog Links** | **Course Links** | **GitHub Links** | **Google Docs/Spreadsheet Links** |
-
  **Screenshots** | **Notes** | **Book List** | **Reading List** |
 |-------------------|----------------|------------------|------------------|-----------------------------------|-----------------|-----------|---------------|-----------------|
 | [AWS Basics](https://www.youtube.com/...), [Advanced AWS Concepts](https://www.youtube.com/...) | [AWS Best Practices](https://exampleblog.com/aws), [How to Use AWS Services](https://anotherblog.com/aws-services) | [Udemy: AWS Certified Solutions Architect](https://www.udemy.com/...), [Coursera: AWS Fundamentals](https://www.coursera.org/...) | [AWS Example Projects](https://github.com/user/aws-examples), [AWS Automation Scripts](https://github.com/user/aws-automation) | [AWS Service Cheat Sheet](https://docs.google.com/spreadsheets/d/...), [AWS Best Practices Guide](https://docs.google.com/document/d/...) | ![AWS Example](./screenshots/aws_example.png) | [AWS Notes](./notes/aws_notes.md) | ["AWS Certified Solutions Architect Official Study Guide"](https://www.amazon.com/...), ["AWS Security Best Practices"](https://www.amazon.com/...) | [AWS Articles](./reading-list/aws_reading.md) |
@@ -287,7 +286,6 @@ Everything you need for acing software engineering interviews—coding, system d
 
 | **YouTube Links** | **Blog Links** | **Course Links** | **GitHub Links** | **Google Docs/Spreadsheet Links** | **Screenshots** | **Notes** | **Book List** | **Reading List** |
 |-------------------|----------------|------------------|------------------|-----------------------------------|-----------------|-----------|---------------|-----------------
-
 |
 | [Effective Communication](https://www.youtube.com/...), [Communication Skills for Engineers](https://www.youtube.com/...) | [Top Communication Tips](https://exampleblog.com/communication), [Improving Communication Skills](https://anotherblog.com/communication-skills) | [Udemy: Communication Mastery](https://www.udemy.com/...), [Coursera: Communication Skills for Engineers](https://www.coursera.org/...) | [Communication Examples](https://github.com/user/communication-examples), [Communication Scenarios](https://github.com/user/communication-scenarios) | [Communication Techniques](https://docs.google.com/spreadsheets/d/...), [Communication Skills Guide](https://docs.google.com/document/d/...) | ![Communication Example](./screenshots/communication.png) | [Communication Notes](./notes/communication_notes.md) | ["Crucial Conversations" by Patterson, Grenny, McMillan, Switzler](https://www.amazon.com/...), ["The Art of Communication" by Thich Nhat Hanh](https://www.amazon.com/...) | [Communication Reading List](./reading-list/communication_reading.md) |
 
