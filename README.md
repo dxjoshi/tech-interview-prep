@@ -186,7 +186,9 @@ Everything you need for acing software engineering interviews—coding, system d
 - **Load Balancing**: Techniques and strategies for load distribution.
 - **Database Sharding**: Splitting data for scalability.
 - **Caching**: Improving performance with caching mechanisms.
-
+- **Top Questions**:
+  - [TinyURL Architecture](https://lnkd.in/evFTZVQq)
+  - 
 ---
 
 ## AWS Concepts
