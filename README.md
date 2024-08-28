@@ -1,12 +1,6 @@
 # tech-interview-prep
 Everything you need for acing software engineering interviews—coding, system design, and more!
 
-Sure! Below is the complete Markdown file structured according to the order you initially provided. Each section includes a table of resources and a list of relevant topics.
-
-# Comprehensive Learning and Resource Guide
-
-Welcome to your comprehensive learning and resource guide! This document is structured to help you efficiently navigate through various technical and non-technical topics essential for career development. Each section contains relevant resources and topics to enhance your understanding and skills.
-
 ## Table of Contents
 
 | Section                                  | Description                                   |
