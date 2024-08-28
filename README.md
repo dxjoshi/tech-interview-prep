@@ -5,15 +5,15 @@ Everything you need for acing software engineering interviews—coding, system d
 
 | Section                                  | Description                                   |
 |------------------------------------------|-----------------------------------------------|
-| [Data Structures and Algorithms (DSA)](#dsa) | Covers key concepts and problem-solving techniques in DSA |
-| [Low-Level Design (LLD)](#lld)           | Principles and patterns for designing robust and scalable low-level systems |
+| [Data Structures and Algorithms](#dsa) | Covers key concepts and problem-solving techniques in DSA |
+| [Low-Level Design](#lld)           | Principles and patterns for designing robust and scalable low-level systems |
 | [API Design](#api-design)                | Best practices for designing effective APIs   |
 | [Database Schema Design](#db-schema-design) | Guidelines for structuring database schemas   |
 | [Design Patterns](#design-patterns)      | Common software design patterns and their applications |
 | [Java Concurrency](#java-concurrency)    | Concurrency concepts and practices in Java    |
 | [Machine Coding](#machine-coding)        | Real-time coding practices and problem-solving |
 | [SQL](#sql)                              | SQL query writing, optimization, and best practices |
-| [High-Level Design (HLD)](#hld)          | Architecture and design principles for large systems |
+| [High-Level Design](#hld)          | Architecture and design principles for large systems |
 | [AWS Concepts](#aws-concepts)            | Introduction to Amazon Web Services and key cloud concepts |
 | [CS Fundamentals - CN, OS, DBMS](#cs-fundamentals) | Core computer science concepts including Computer Networks, Operating Systems, and Database Management Systems |
 | [Behavioral Interview](#behavioral-interview) | Strategies for effective behavioral interviews |
@@ -25,7 +25,7 @@ Everything you need for acing software engineering interviews—coding, system d
 
 ---
 
-## Data Structures and Algorithms (DSA)
+## Data Structures and Algorithms
 
 ### Resources
 
@@ -43,7 +43,7 @@ Everything you need for acing software engineering interviews—coding, system d
 
 ---
 
-## Low-Level Design (LLD)
+## Low-Level Design
 
 ### Resources
 
