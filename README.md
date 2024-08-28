@@ -171,7 +171,7 @@ Everything you need for acing software engineering interviews—coding, system d
 
 ---
 
-## High Level Design (HLD)
+## High Level Design
 
 ### Resources
 
