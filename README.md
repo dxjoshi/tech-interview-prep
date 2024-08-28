@@ -180,14 +180,104 @@ Everything you need for acing software engineering interviews—coding, system d
 | [HLD Basics](https://www.youtube.com/...), [Scalable System Design](https://www.youtube.com/...) | [High-Level Design Principles](https://exampleblog.com/hld), [System Design Challenges](https://anotherblog.com/system-design-challenges) | [Udemy: System Design Fundamentals](https://www.udemy.com/...), [Coursera: Scalable System Design](https://www.coursera.org/...) | [System Design Examples](https://github.com/user/system-design-examples), [Architecture Repos](https://github.com/user/architecture-repos) | [HLD Diagrams](https://docs.google.com/spreadsheets/d/...), [Architecture Documentation](https://docs.google.com/document/d/...) | ![HLD Diagram](./screenshots/hld_diagram.png) | [HLD Notes](./notes/hld_notes.md) | ["Designing Data-Intensive Applications" by Martin Kleppmann](https://www.amazon.com/...), ["Site Reliability Engineering"](https://www.amazon.com/...) | [HLD Articles](./reading-list/hld_reading.md) |
 
 ### Topics
+- **General**
+ - 𝐁𝐚𝐝 𝐝𝐢𝐬𝐭𝐫𝐢𝐛𝐮𝐭𝐞𝐝 𝐬𝐲𝐬𝐭𝐞𝐦𝐬:
+
+1. Assumes the network is reliable
+2. Assumes latency is 0
+3. Assumes bandwidth is infinite
+4. Assumes the network is secure
+5. Assumes network topology doesn't change
+6. Assumes there is a single administrator
+7. Assumes data transport cost is 0
+8. Assumes the network is homogeneous
+
+
+𝐆𝐨𝐨𝐝 𝐝𝐢𝐬𝐭𝐫𝐢𝐛𝐮𝐭𝐞𝐝 𝐬𝐲𝐬𝐭𝐞𝐦𝐬:
+
+1. Implements retries, timeouts, and fallbacks to handle unreliable networks
+2. Uses asynchronous systems, caching, batching, and parallel processing to keep latency low
+3. Compresses data and uses CDN to reduce bandwidth usage
+4. Implements encryption, secure protocols, and firewalls to make the network secure
+5. Uses service discovery and keeps design simple to adapt to network topology changes
+6. Restricts system access based on roles and permissions, and uses proper auth mechanisms
+7. Uses smart data sync mechanisms and compresses data to reduce costs of data transfer
+8. Keeps the system flexible to operate on different types of servers
+  
+1. Consider using a Cache for read-heavy systems.
+2. For low latency, use a Cache & CDN.
+3. Utilize a Message Queue for async processing in write-heavy systems.
+4. Choose an RDBMS or SQL Database for ACID compliance.
+5. Opt for a No-SQL Database for unstructured data without ACID requirements.
+6. Use Blob/Object storage for systems with complex data like videos, images, files, etc.
+7. Employ a Message Queue & Cache for systems with complex pre-computation tasks like a news feed.
+8. Use a search index, tries, or a search engine (like Elasticsearch) for high-volume data searching.
+9. Consider Database Sharding for scaling SQL Databases.
+10. Use a Load Balancer for High Availability, Performance, & Throughput.
+11. Employ a CDN for faster global data delivery, reliability, high availability, & performance.
+12. Choose a Graph Database for systems with data involving nodes, edges, and relationships.
+13. Implement Horizontal Scaling for scaling various components (servers, databases, etc.).
+14. Utilize Database Indexes for high-performing database queries.
+15. Use Batch Processing & Message Queues for bulk job processing.
+16. Employ a Rate Limiter to reduce server load and prevent DOS attacks.
+17. Consider using an API Gateway (Authentication, SSL Termination, Routing, etc.) for systems with microservices.
+18. Implement Redundancy for components with a single point of failure.
+19. Implement Data Replication (creating multiple copies of data on different servers) for fault tolerance and durability.
+20. Use Websockets for fast, bi-directional user-to-user communication.
+21. Implement a Heartbeat mechanism for detecting failures in distributed systems.
+22. Ensure data integrity using a Checksum Algorithm.
+23. Implement Consistent Hashing to efficiently scale servers with node add/removal and avoid hotspots.
+24. Use Gossip Protocol for decentralized data transfer between servers.
+25. Utilize Quadtree, Geohash, etc., for location-based functionalities like maps and nearby resources.
+26. Prefer generic names like message queues, object storage, etc., instead of specific technology names.
+27. Mention that a system with High Availability cannot have strong consistency; eventual consistency is possible.
+28. Explain DNS (Domain Name System) when discussing how domain name queries resolve IP addresses in browsers.
+29. Implement Pagination to limit response data for network requests with a large amount of data.
+30. Use LRU (Least Recently Used) Cache eviction policy and understand its Data Structure and Implementation.
 
 - **Architectural Patterns**: Microservices, monoliths, event-driven architecture.
+ - GraphQL Federation
+ - Service Discovery
+ - Shared Nothing Architecture
+ - Gossip Protocol
 - **Scalability**: Horizontal vs. vertical scaling.
 - **Load Balancing**: Techniques and strategies for load distribution.
 - **Database Sharding**: Splitting data for scalability.
 - **Caching**: Improving performance with caching mechanisms.
+- **Top Articles**
+ - [How Uber Drives 40M Reads/Sec with Integrated Cache](https://www.hungryminds.dev/p/uber-drives-40m-readssec-integrated-cache)
+ - [How Pinterest scaled to 11 million users with only 6 engineers](https://read.engineerscodex.com/p/how-pinterest-scaled-to-11-million)
+ - [How Quora scaled MySQL to 100k+ Queries Per Second](https://blog.quastor.org/p/quora-scaled-mysql-100k-queries-per-second)
+ - [How Canva Supports Real-Time Collaboration for 135 Million Monthly Users](https://newsletter.systemdesign.one/p/rsocket)
+ - [How LinkedIn Scales to 5 Million Profiles Reads Per Second](https://www.hungryminds.dev/p/linkedin-scales-5-million-profiles-per-second)
+ - [How Instagram scaled to 14 million users with only 3 engineers](https://read.engineerscodex.com/p/how-instagram-scaled-to-14-million)
+ - [Prime Video: Amazon's Secret to Streaming Video at Scale](https://www.hungryminds.dev/p/prime-amazons-secret-streaming-video-scale)
+ - [Architecture Notes](https://architecturenotes.co/)
+ - [How Discord Stores Trillions of messages](https://discord.com/blog/how-discord-stores-trillions-of-messages)
+ - [How Agoda manages 1.8 trillion Events per day on Kafka](https://medium.com/agoda-engineering/how-agoda-manages-1-8-trillion-events-per-day-on-kafka-1d6c3f4a7ad1)
+ - [Avoiding Double Payments in a Distributed Payments System](https://medium.com/airbnb-engineering/avoiding-double-payments-in-a-distributed-payments-system-2981f6b070bb)
+ - [FB Video Broadcasting](https://engineering.fb.com/2015/12/03/ios/under-the-hood-broadcasting-live-video-to-millions/)
+ - [Cache Invalidation](https://surfingcomplexity.blog/2022/11/25/cache-invalidation-really-is-one-of-the-hardest-things-in-computer-science/)
+ - [Non-Functional Requirements](https://www.redhat.com/architect/nonfunctional-requirements-architecture)
+ - [Brief History of Scaling Uber](https://www.linkedin.com/pulse/brief-history-scaling-uber-josh-clemm-dfqgc/)
+ - [Learn System Design in a Hurry](https://www.hellointerview.com/learn/system-design/in-a-hurry/introduction)
+ - [Comparing Three Real-Time OLAP Databases: Apache Pinot, Apache Druid, and ClickHouse](https://startree.ai/blog/a-tale-of-three-real-time-olap-databases)
 - **Top Questions**:
 ### 𝐄𝐚𝐬𝐲
+
+- [Chat Service](https://link.excalidraw.com/l/83erRkG0D8B/91MXgkgu1yH)  
+- [Google Docs](https://link.excalidraw.com/l/83erRkG0D8B/5cOMydcNbG4)  
+- [ID generator](https://link.excalidraw.com/l/83erRkG0D8B/GcAfVFEdRT)  
+- [Key-Value Storage](https://link.excalidraw.com/l/83erRkG0D8B/3BzNx68enCh)  
+- [Notification Service](https://link.excalidraw.com/l/83erRkG0D8B/9a41NkQLgO)  
+- [Rate Limiter](https://link.excalidraw.com/l/83erRkG0D8B/AMMN3MT1DhH)  
+- [Twitter](https://link.excalidraw.com/l/83erRkG0D8B/4fjpNLpYcdO)  
+- [URL Shortener](https://link.excalidraw.com/l/83erRkG0D8B/ASJwB2NemVq)  
+- [Yelp & Location Services](https://link.excalidraw.com/l/83erRkG0D8B/9inHJRiDk05)  
+- [YouTube](https://link.excalidraw.com/l/83erRkG0D8B/5PBv0eKsavQ)  
+- [Cache](https://link.excalidraw.com/l/83erRkG0D8B/8zfyHn4b8kb)  
+- [General Knowledge](https://link.excalidraw.com/l/83erRkG0D8B/2aPx0l0MX0k)
+- 
 - [Design URL Shortener like TinyURL](https://systemdesign.one/url-shortening-system-design/)
 - [Design Text Storage Service like Pastebin]()
 - [Design Content Delivery Network (CDN)]()
