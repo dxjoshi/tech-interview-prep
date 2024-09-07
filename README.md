@@ -23,6 +23,7 @@ Everything you need for acing software engineering interviews—coding, system d
 | [Salary Negotiations](#salary-negotiations) | Tips and strategies for negotiating salary    |
 | [Resume](#resume)                        | Crafting an impactful resume                  |
 
+
 ---
 
 ## Data Structures and Algorithms
