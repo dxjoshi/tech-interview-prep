@@ -93,11 +93,939 @@ Everything you need for acing software engineering interviews—coding, system d
 - **Normalization**: 1NF, 2NF, 3NF, and BCNF.
 - **Denormalization**: When and why to denormalize.
 - **Entity-Relationship Diagrams (ERDs)**:
+- **Relationships such as Primary Key and Foreign Key**:
+- Concepts include 1-1, 1-many, many-many, bridge tables, and self-referencing tables.
 
  Designing ERDs and translating them into schemas.
 - **Indexes and Keys**: Use of primary, foreign, and composite keys.
 - **Data Modeling**: Best practices for modeling data relationships.
 
+### Database Schema Design Guide
+
+##### Step 1: Identify Entities
+- Identify the main entities in your system. These will typically become tables in your database.
+Example: Movie, Person, Role
+
+##### Step 2: Define Attributes
+- For each entity, list its attributes. These will become columns in your tables. Include primary keys and unique identifiers.   
+Example:
+- Movie: id, title, release_year, runtime_minutes
+- Person: id, name, birth_date
+- Role: id, role_name
+
+##### Step 3: Determine Relationships
+Identify how entities relate to each other. There are three main types of relationships:
+
+1. One-to-One (1:1)
+2. One-to-Many (1:N)
+3. Many-to-Many (M:N)
+
+Example:
+- A Person can have many Roles in many Movies (M:N)
+- A Movie can have many Persons in many Roles (M:N)
+
+##### Step 4: Implement Relationships
+
+###### One-to-One (1:1)
+- Use a foreign key in one of the tables to reference the primary key of the other.
+- Add a unique constraint on the foreign key.
+
+Example:
+```sql
+CREATE TABLE UserProfile (
+    user_id INTEGER PRIMARY KEY,
+    profile_data TEXT,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES Users(id),
+    CONSTRAINT uk_user_profile UNIQUE (user_id)
+);
+```
+
+###### One-to-Many (1:N)
+- Add a foreign key in the "many" table referencing the "one" table.
+
+Example:
+```sql
+CREATE TABLE Posts (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER,
+    content TEXT,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES Users(id)
+);
+```
+
+###### Many-to-Many (M:N)
+- Create a junction (bridge) table that references both entities.
+
+``````
+##### Intuition for Junction Tables
+
+The need for a junction table arises when you have a many-to-many relationship between entities. Here's how to recognize and implement them:
+
+1. Identify the relationship: If you find yourself saying "A can have many B, and B can have many A", you likely need a junction table.
+2. Check for additional information: If the relationship itself needs to store data, this confirms the need for a junction table.
+3. Create the junction table: Name it after both entities (e.g., MoviePersonRoles) and include foreign keys to both entities.
+4. Add any relationship-specific attributes to the junction table.
+
+Example: MoviePersonRoles
+
+1. Identify the relationship:
+- A Person can be in many Movies
+- A Movie can have many Persons
+- A Person can have different Roles in different Movies
+
+2. Check for additional information:
+- We need to store which Role a Person had in a specific Movie
+- We might want to store character names for actors
+
+3. Create the junction table:
+   ```sql
+   CREATE TABLE MoviePersonRoles (
+       movie_id INTEGER,
+       person_id INTEGER,
+       role_id INTEGER,
+       character_name VARCHAR(255),
+       PRIMARY KEY (movie_id, person_id, role_id),
+       CONSTRAINT fk_movie FOREIGN KEY (movie_id) REFERENCES Movies(id),
+       CONSTRAINT fk_person FOREIGN KEY (person_id) REFERENCES Persons(id),
+       CONSTRAINT fk_role FOREIGN KEY (role_id) REFERENCES Roles(id)
+   );
+   ```
+
+4. Add relationship-specific attributes:
+- We added `character_name` to store the character an actor played in a specific movie.
+
+``````
+
+###### Self-Referencing Tables
+- Use when an entity has a relationship with itself (e.g., employees and managers).
+
+Example:
+```sql
+CREATE TABLE Employees (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    manager_id INTEGER,
+    CONSTRAINT fk_manager FOREIGN KEY (manager_id) REFERENCES Employees(id)
+);
+```
+
+##### Step 5: Normalize the Schema
+Apply normalization rules to reduce data redundancy and improve data integrity.
+  - First Normal Form (1NF): Eliminate repeating groups
+  - Second Normal Form (2NF): Remove partial dependencies
+  - Third Normal Form (3NF): Remove transitive dependencies
+
+##### Step 6: Add Constraints
+Add constraints to ensure data integrity:
+  - Primary Keys
+  - Foreign Keys
+  - Unique Constraints
+  - Check Constraints
+
+##### Step 7: Consider Indexing
+Add indexes to columns that will be frequently searched or joined.
+
+Example:
+```sql
+CREATE INDEX idx_movie_title ON Movies(title);
+CREATE INDEX idx_person_name ON Persons(name);
+```
+
+
+### Questions
+
+#### Q.1(a)
+- Design a relational database schema for employees of an organisation. The information we want to store is:
+    - first name
+    - last name
+    - display name (first name + last name)
+    - joining date
+    - leaving date   
+    - reporting manager
+    - team name
+    - location (location of employee residence)
+    - office location
+
+![Employee Schema Design](resources/databases/schema_employee_management.png)
+
+~~~~sql
+
+CREATE TABLE employees (
+    id BIGINT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    manager_id BIGINT,
+    team_id BIGINT,
+    location_id BIGINT,
+    FOREIGN KEY (manager_id) REFERENCES employees(id),
+    FOREIGN KEY (team_id) REFERENCES teams(id),
+    FOREIGN KEY (location_id) REFERENCES locations(id)
+);
+
+CREATE TABLE employee_contract (
+    id INT PRIMARY KEY,
+    joining_date DATE,
+    leaving_date DATE,
+    employee_id BIGINT,
+    FOREIGN KEY (employee_id) REFERENCES employees(id)
+);
+
+CREATE TABLE teams (
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(50),
+    location_id BIGINT,
+    FOREIGN KEY (location_id) REFERENCES locations(id)
+);
+
+CREATE TABLE locations (
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(50)
+);
+~~~~
+
+#### Q.1(b)
+- Employee can come back to rejoin the company. Design schema to store an employee's past and present data without removing or duplicating information?
+
+![Employee Schema Design with History](resources/databases/schema_employee_management_history.png)
+~~~~sql
+CREATE TABLE employees (
+    id BIGINT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+);
+
+CREATE TABLE employee_contract (
+    id INT PRIMARY KEY,
+    manager_id BIGINT,
+    team_id BIGINT,
+    location_id BIGINT,
+    joining_date DATE,
+    leaving_date DATE,
+    employee_id BIGINT,
+    FOREIGN KEY (manager_id) REFERENCES employees(id),
+    FOREIGN KEY (team_id) REFERENCES teams(id),
+    FOREIGN KEY (location_id) REFERENCES locations(id),
+    FOREIGN KEY (employee_id) REFERENCES employees(id)
+);
+
+CREATE TABLE teams (
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(50),
+    location_id BIGINT,
+    FOREIGN KEY (location_id) REFERENCES locations(id)
+);
+
+CREATE TABLE locations (
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(50)
+);
+~~~~
+
+#### Q.2
+
+- Multiplayer Game DB: Design ER Diagram for a multiplayer game app, having the following requirements:
+  - Player data
+  - Question data
+  - Trivia Game data - Combines multiple questions
+  - Map game to players - Player can participate in multiple games
+  - Table to maintain all the players answers for each game
+
+![Multiplayer Game Schema Design](./resources/databases/schema_multiplayer_game.png)
+
+~~~~sql
+-- Players table
+CREATE TABLE Players (
+    player_id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Games table
+CREATE TABLE Games (
+    game_id SERIAL PRIMARY KEY,
+    game_name VARCHAR(100) NOT NULL,
+    start_time TIMESTAMP,
+    end_time TIMESTAMP,
+    max_players INTEGER,
+    status VARCHAR(20) CHECK (status IN ('pending', 'active', 'completed'))
+);
+
+-- GamePlayerAnswers table (Maintains all player answers for each game)
+CREATE TABLE GamePlayerAnswers (
+    answer_id SERIAL PRIMARY KEY,
+    game_id INTEGER,
+    player_id INTEGER,
+    question_id INTEGER,
+    player_answer VARCHAR(255),
+    is_correct BOOLEAN,
+    answer_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (game_id, player_id, question_id),
+    FOREIGN KEY (game_id) REFERENCES Games(game_id),
+    FOREIGN KEY (player_id) REFERENCES Players(player_id),
+    FOREIGN KEY (question_id) REFERENCES Questions(question_id)
+);
+
+-- GamePlayerMapping table (Maps games to players)
+CREATE TABLE GamePlayerMapping (
+    game_id INTEGER REFERENCES Games(game_id),
+    player_id INTEGER REFERENCES Players(player_id),
+    join_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    score INTEGER DEFAULT 0,
+    PRIMARY KEY (game_id, player_id),
+    FOREIGN KEY (game_id) REFERENCES Games(game_id),
+    FOREIGN KEY (player_id) REFERENCES Players(player_id)
+);
+
+-- Questions table
+CREATE TABLE Questions (
+    question_id SERIAL PRIMARY KEY,
+    question_text TEXT NOT NULL,
+    correct_answer VARCHAR(255) NOT NULL,
+    difficulty_level INTEGER CHECK (difficulty_level BETWEEN 1 AND 10),
+    category VARCHAR(50)
+);
+
+-- Table to associate questions with games
+CREATE TABLE GameQuestions (
+    game_id INTEGER,
+    question_id INTEGER,
+    PRIMARY KEY (game_id, question_id),
+    CONSTRAINT fk_gamequestions_game FOREIGN KEY (game_id) REFERENCES Games(game_id),
+    CONSTRAINT fk_gamequestions_question FOREIGN KEY (question_id) REFERENCES Questions(question_id)
+);
+~~~~
+
+#### Q.3(a)
+
+- Design a database so that we can model:
+  - Movie
+  - Person
+  - Role on movie (Actor, producer, Storywriter etc)
+
+The schema should allow us to answer the following questions. 
+  - Give me all the movies that an actor has been in?
+  - Give me all the movies by director?
+  - List the names of all the camera assistants for a movie?
+
+#### Q.3(b)
+- What could we do at the database to speed these queries up?
+
+![Movie Schema Design](./resources/databases/schema_movie_management.png)
+
+~~~~sql
+-- Movies table
+CREATE TABLE Movies (
+    movie_id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    release_year INTEGER,
+    runtime_minutes INTEGER,
+    CONSTRAINT uk_movies_title_year UNIQUE (title, release_year)
+);
+
+-- Persons table
+CREATE TABLE Persons (
+    person_id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    birth_date DATE,
+    CONSTRAINT uk_persons_name UNIQUE (name)
+);
+
+-- Roles table
+CREATE TABLE Roles (
+    role_id SERIAL PRIMARY KEY,
+    role_name VARCHAR(50) NOT NULL,
+    CONSTRAINT uk_roles_name UNIQUE (role_name)
+);
+
+-- MoviePersonRoles table (junction table)
+CREATE TABLE MoviePersonRoles (
+    movie_id INTEGER,
+    person_id INTEGER,
+    role_id INTEGER,
+    character_name VARCHAR(255),
+    PRIMARY KEY (movie_id, person_id, role_id),
+    CONSTRAINT fk_moviepersonroles_movie FOREIGN KEY (movie_id) REFERENCES Movies(movie_id),
+    CONSTRAINT fk_moviepersonroles_person FOREIGN KEY (person_id) REFERENCES Persons(person_id),
+    CONSTRAINT fk_moviepersonroles_role FOREIGN KEY (role_id) REFERENCES Roles(role_id)
+);
+
+-- Create indexes for performance
+CREATE INDEX idx_persons_name ON Persons(name);
+CREATE INDEX idx_moviepersonroles_person_role ON MoviePersonRoles(person_id, role_id);
+CREATE INDEX idx_movies_title ON Movies(title);
+
+-- Partitioning for large tables
+-- Optimizing queries
+
+
+~~~~
+
+
+#### Q.4
+- Design a relational database schema for Employee Performance Review System, to maintain:
+   - Employee data
+   - Skill data
+   - Forms → by combining multiple skills
+   - Map Form to Employees → One employee can be assigned multiple forms
+   - Table to maintain the user entered response for a form against each skill
+
+![Employee Performance Review Schema Design](./resources/databases/schema_employee_performance_review.png)
+~~~~sql
+
+-- Employees table
+CREATE TABLE Employees (
+    employee_id SERIAL PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    hire_date DATE NOT NULL,
+    department VARCHAR(50),
+    CONSTRAINT uk_employees_email UNIQUE (email)
+);
+
+-- Skills table
+CREATE TABLE Skills (
+    skill_id SERIAL PRIMARY KEY,
+    skill_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    CONSTRAINT uk_skills_name UNIQUE (skill_name)
+);
+
+-- Forms table
+CREATE TABLE Forms (
+    form_id SERIAL PRIMARY KEY,
+    form_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uk_forms_name UNIQUE (form_name)
+);
+
+-- FormSkills table (junction table for Forms and Skills)
+CREATE TABLE FormSkills (
+    form_id INTEGER,
+    skill_id INTEGER,
+    skill_order INTEGER NOT NULL,
+    PRIMARY KEY (form_id, skill_id),
+    CONSTRAINT fk_formskills_form FOREIGN KEY (form_id) REFERENCES Forms(form_id),
+    CONSTRAINT fk_formskills_skill FOREIGN KEY (skill_id) REFERENCES Skills(skill_id)
+);
+
+-- EmployeeForms table (junction table for Employees and Forms)
+CREATE TABLE EmployeeForms (
+    employee_id INTEGER,
+    form_id INTEGER,
+    assigned_date DATE NOT NULL,
+    due_date DATE,
+    status VARCHAR(20) CHECK (status IN ('pending', 'in_progress', 'completed')),
+    PRIMARY KEY (employee_id, form_id),
+    CONSTRAINT fk_employeeforms_employee FOREIGN KEY (employee_id) REFERENCES Employees(employee_id),
+    CONSTRAINT fk_employeeforms_form FOREIGN KEY (form_id) REFERENCES Forms(form_id)
+);
+
+-- SkillResponses table
+CREATE TABLE SkillResponses (
+    response_id SERIAL PRIMARY KEY,
+    employee_id INTEGER,
+    form_id INTEGER,
+    skill_id INTEGER,
+    rating INTEGER CHECK (rating BETWEEN 1 AND 5),
+    comment TEXT,
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_skillresponses_employee FOREIGN KEY (employee_id) REFERENCES Employees(employee_id),
+    CONSTRAINT fk_skillresponses_form FOREIGN KEY (form_id) REFERENCES Forms(form_id),
+    CONSTRAINT fk_skillresponses_skill FOREIGN KEY (skill_id) REFERENCES Skills(skill_id),
+    CONSTRAINT uk_skillresponses_employee_form_skill UNIQUE (employee_id, form_id, skill_id)
+);
+
+-- Create indexes for performance
+CREATE INDEX idx_employees_department ON Employees(department);
+CREATE INDEX idx_formskills_form_skill ON FormSkills(form_id, skill_id);
+CREATE INDEX idx_employeeforms_employee_status ON EmployeeForms(employee_id, status);
+CREATE INDEX idx_skillresponses_employee_form ON SkillResponses(employee_id, form_id);
+~~~~
+
+#### Q.5
+- Design a schema for a chatting service to allow users to:
+   - Send direct messages
+   - Send group messages
+   - Send replies aka have threads for a specific direct or group message
+
+~~~~sql
+-- Users Table
+CREATE TABLE Users (
+    user_id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Conversations Table (for both direct and group chats)
+CREATE TABLE Conversations (
+    conversation_id SERIAL PRIMARY KEY,
+    conversation_name VARCHAR(100),
+    is_group_chat BOOLEAN NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Conversation Participants Table
+CREATE TABLE ConversationParticipants (
+    conversation_id INTEGER REFERENCES Conversations(conversation_id),
+    user_id INTEGER REFERENCES Users(user_id),
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (conversation_id, user_id)
+);
+
+-- Messages Table
+CREATE TABLE Messages (
+    message_id SERIAL PRIMARY KEY,
+    conversation_id INTEGER REFERENCES Conversations(conversation_id),
+    sender_id INTEGER REFERENCES Users(user_id),
+    content TEXT NOT NULL,
+    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    parent_message_id INTEGER REFERENCES Messages(message_id)
+);
+
+-- Indexes for performance
+CREATE INDEX idx_messages_conversation_id ON Messages(conversation_id);
+CREATE INDEX idx_messages_parent_message_id ON Messages(parent_message_id);
+CREATE INDEX idx_conversation_participants_user_id ON ConversationParticipants(user_id);
+
+/*
+Explanation of how this design allows each functionality:
+
+1. Send direct messages:
+   - Create a Conversation with is_group_chat set to FALSE.
+   - Add two users to the ConversationParticipants table for this conversation.
+   - Users can then send messages by inserting rows into the Messages table with the corresponding conversation_id.
+
+2. Send group messages:
+   - Create a Conversation with is_group_chat set to TRUE.
+   - Add multiple users to the ConversationParticipants table for this conversation.
+   - Users can send messages to the group by inserting rows into the Messages table with the corresponding conversation_id.
+
+3. Send replies (threads):
+   - When sending a reply, insert a new row in the Messages table with the parent_message_id set to the message_id of the message being replied to.
+   - This creates a hierarchical structure of messages, allowing for threaded conversations.
+   - Replies can be made to both direct and group messages, as the parent_message_id is independent of the conversation type.
+
+*/
+~~~~
+
+#### Q.6
+- Design the database schema for maintaining the information about the students, courses and grades acquired by the students. It is a small school and there is no concept of departments e.g. Computer Science, Electronics, etc. Below are types of requests which principal is expecting from parents/students in future which need to be served:
+  1. What was the grade of the student S for course C?
+  2. List all courses are taken by student S?
+  3. What all course were taught in semester S?  
+
+In order to serve above requests, he/she want to store the below data/info:  
+   1. first name
+   2. last name
+   3. display name (first name + last name)
+   4. course name
+   5. course code
+   6. credits
+   7. prerequisite course
+   8. instructor
+   9. semester
+   10. year
+   11. grade
+
+- How will we handle cases where?
+  - Particular course has another course as prerequisites.
+  - Particular course has multiple active courses as prerequisites.
+
+~~~~sql
+
+-- Create Students table
+CREATE TABLE Students (
+    student_id INT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    display_name VARCHAR(100) GENERATED ALWAYS AS (CONCAT(first_name, ' ', last_name)) STORED
+);
+
+-- Create Courses table
+CREATE TABLE Courses (
+    course_id INT PRIMARY KEY AUTO_INCREMENT,
+    course_name VARCHAR(100) NOT NULL,
+    course_code VARCHAR(20) UNIQUE NOT NULL,
+    credits INT NOT NULL
+);
+
+-- Create Prerequisites table
+CREATE TABLE Prerequisites (
+    prerequisite_id INT PRIMARY KEY AUTO_INCREMENT,
+    course_id INT,
+    prerequisite_course_id INT,
+    FOREIGN KEY (course_id) REFERENCES Courses(course_id),
+    FOREIGN KEY (prerequisite_course_id) REFERENCES Courses(course_id)
+);
+
+-- Create Instructors table
+CREATE TABLE Instructors (
+    instructor_id INT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    display_name VARCHAR(100) GENERATED ALWAYS AS (CONCAT(first_name, ' ', last_name)) STORED
+);
+
+-- Create Enrollments table
+CREATE TABLE Enrollments (
+    enrollment_id INT PRIMARY KEY AUTO_INCREMENT,
+    student_id INT,
+    course_id INT,
+    instructor_id INT,
+    semester VARCHAR(20) NOT NULL,
+    year INT NOT NULL,
+    grade VARCHAR(2),
+    FOREIGN KEY (student_id) REFERENCES Students(student_id),
+    FOREIGN KEY (course_id) REFERENCES Courses(course_id),
+    FOREIGN KEY (instructor_id) REFERENCES Instructors(instructor_id)
+);
+
+-- Indexes to improve query performance
+CREATE INDEX idx_enrollments_student ON Enrollments(student_id);
+CREATE INDEX idx_enrollments_course ON Enrollments(course_id);
+CREATE INDEX idx_enrollments_semester_year ON Enrollments(semester, year);
+CREATE INDEX idx_prerequisites_course ON Prerequisites(course_id);
+
+-- Sample queries to address the principal's requests:
+
+-- 1. What was the grade of the student S for course C?
+-- SELECT e.grade
+-- FROM Enrollments e
+-- JOIN Students s ON e.student_id = s.student_id
+-- JOIN Courses c ON e.course_id = c.course_id
+-- WHERE s.display_name = 'Student Name' AND c.course_code = 'COURSE_CODE';
+
+-- 2. List all courses taken by student S?
+-- SELECT c.course_name, c.course_code, e.semester, e.year
+-- FROM Enrollments e
+-- JOIN Students s ON e.student_id = s.student_id
+-- JOIN Courses c ON e.course_id = c.course_id
+-- WHERE s.display_name = 'Student Name';
+
+-- 3. What all courses were taught in semester S?
+-- SELECT DISTINCT c.course_name, c.course_code, i.display_name AS instructor
+-- FROM Enrollments e
+-- JOIN Courses c ON e.course_id = c.course_id
+-- JOIN Instructors i ON e.instructor_id = i.instructor_id
+-- WHERE e.semester = 'Fall' AND e.year = 2023;
+
+-- 4. List all prerequisites for a specific course
+-- SELECT p.course_name AS prerequisite_course
+-- FROM Prerequisites pr
+-- JOIN Courses c ON pr.course_id = c.course_id
+-- JOIN Courses p ON pr.prerequisite_course_id = p.course_id
+-- WHERE c.course_code = 'COURSE_CODE';
+~~~~
+
+#### Q.7
+- Design DB for a shared shopping cart experience for multiple online stores. Following are the requirements:
+It is multi tenant. That is all data lives in one database.
+The schema should include everything from a User signs in, all the way until check-out. Billing is explicitly out of scope as that is handled by PayFriend.
+
+~~~~sql
+
+-- Multi-tenant Shared Shopping Cart Database Schema
+
+-- Tenants (Online Stores)
+CREATE TABLE tenants (
+    tenant_id SERIAL PRIMARY KEY,
+    store_name VARCHAR(255) NOT NULL,
+    domain VARCHAR(255) UNIQUE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Users
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY,
+    tenant_id INTEGER REFERENCES tenants(tenant_id),
+    email VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (tenant_id, email)
+);
+
+-- Products
+CREATE TABLE products (
+    product_id SERIAL PRIMARY KEY,
+    tenant_id INTEGER REFERENCES tenants(tenant_id),
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    price DECIMAL(10, 2) NOT NULL,
+    stock_quantity INTEGER NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Shopping Carts
+CREATE TABLE shopping_carts (
+    cart_id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(user_id),
+    tenant_id INTEGER REFERENCES tenants(tenant_id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    last_updated TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Cart Items
+CREATE TABLE cart_items (
+    cart_item_id SERIAL PRIMARY KEY,
+    cart_id INTEGER REFERENCES shopping_carts(cart_id),
+    product_id INTEGER REFERENCES products(product_id),
+    quantity INTEGER NOT NULL,
+    added_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Orders
+CREATE TABLE orders (
+    order_id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(user_id),
+    tenant_id INTEGER REFERENCES tenants(tenant_id),
+    total_amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Order Items
+CREATE TABLE order_items (
+    order_item_id SERIAL PRIMARY KEY,
+    order_id INTEGER REFERENCES orders(order_id),
+    product_id INTEGER REFERENCES products(product_id),
+    quantity INTEGER NOT NULL,
+    price_at_time DECIMAL(10, 2) NOT NULL
+);
+
+-- Shipping Addresses
+CREATE TABLE shipping_addresses (
+    address_id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(user_id),
+    address_line1 VARCHAR(255) NOT NULL,
+    address_line2 VARCHAR(255),
+    city VARCHAR(100) NOT NULL,
+    state VARCHAR(100),
+    country VARCHAR(100) NOT NULL,
+    postal_code VARCHAR(20) NOT NULL,
+    is_default BOOLEAN DEFAULT false
+);
+
+-- Order Shipping
+CREATE TABLE order_shipping (
+    order_shipping_id SERIAL PRIMARY KEY,
+    order_id INTEGER REFERENCES orders(order_id),
+    address_id INTEGER REFERENCES shipping_addresses(address_id),
+    shipping_method VARCHAR(100) NOT NULL,
+    tracking_number VARCHAR(100)
+);
+
+-- Indexes for performance
+CREATE INDEX idx_users_tenant_id ON users(tenant_id);
+CREATE INDEX idx_products_tenant_id ON products(tenant_id);
+CREATE INDEX idx_shopping_carts_user_id ON shopping_carts(user_id);
+CREATE INDEX idx_shopping_carts_tenant_id ON shopping_carts(tenant_id);
+CREATE INDEX idx_cart_items_cart_id ON cart_items(cart_id);
+CREATE INDEX idx_orders_user_id ON orders(user_id);
+CREATE INDEX idx_orders_tenant_id ON orders(tenant_id);
+CREATE INDEX idx_order_items_order_id ON order_items(order_id);
+CREATE INDEX idx_shipping_addresses_user_id ON shipping_addresses(user_id);
+
+~~~~
+
+Handle a customer complaint that they put their item in their cart and then the price was different at check out time, she wants to know how this could happen?
+OR
+Inventory person at one store noticed that he updated an inventory Items price but there were items sold after that point in time that were sold at the old price? How could that happen?
+
+Update the design to fix the issue in both cases
+
+~~~~sql
+
+-- Multi-tenant Shared Shopping Cart Database Schema (Updated for MySQL)
+
+-- Tenants (Online Stores)
+CREATE TABLE tenants (
+    tenant_id INT AUTO_INCREMENT PRIMARY KEY,
+    store_name VARCHAR(255) NOT NULL,
+    domain VARCHAR(255) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- Users
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    tenant_id INT,
+    email VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY (tenant_id, email),
+    FOREIGN KEY (tenant_id) REFERENCES tenants(tenant_id)
+) ENGINE=InnoDB;
+
+-- Products
+CREATE TABLE products (
+    product_id INT AUTO_INCREMENT PRIMARY KEY,
+    tenant_id INT,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tenant_id) REFERENCES tenants(tenant_id)
+) ENGINE=InnoDB;
+
+-- Product Prices (New table to track price history)
+CREATE TABLE product_prices (
+    price_id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT,
+    price DECIMAL(10, 2) NOT NULL,
+    effective_from TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    effective_to TIMESTAMP NULL,
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
+) ENGINE=InnoDB;
+
+-- Product Inventory (New table to track inventory history)
+CREATE TABLE product_inventory (
+    inventory_id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT,
+    stock_quantity INT NOT NULL,
+    effective_from TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    effective_to TIMESTAMP NULL,
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
+) ENGINE=InnoDB;
+
+-- Shopping Carts
+CREATE TABLE shopping_carts (
+    cart_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    tenant_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (tenant_id) REFERENCES tenants(tenant_id)
+) ENGINE=InnoDB;
+
+-- Cart Items (Updated to include price at the time of adding)
+CREATE TABLE cart_items (
+    cart_item_id INT AUTO_INCREMENT PRIMARY KEY,
+    cart_id INT,
+    product_id INT,
+    quantity INT NOT NULL,
+    price_at_add DECIMAL(10, 2) NOT NULL,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cart_id) REFERENCES shopping_carts(cart_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
+) ENGINE=InnoDB;
+
+-- Orders
+CREATE TABLE orders (
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    tenant_id INT,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (tenant_id) REFERENCES tenants(tenant_id)
+) ENGINE=InnoDB;
+
+-- Order Items (No changes needed here)
+CREATE TABLE order_items (
+    order_item_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT,
+    product_id INT,
+    quantity INT NOT NULL,
+    price_at_time DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
+) ENGINE=InnoDB;
+
+-- Shipping Addresses
+CREATE TABLE shipping_addresses (
+    address_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    address_line1 VARCHAR(255) NOT NULL,
+    address_line2 VARCHAR(255),
+    city VARCHAR(100) NOT NULL,
+    state VARCHAR(100),
+    country VARCHAR(100) NOT NULL,
+    postal_code VARCHAR(20) NOT NULL,
+    is_default BOOLEAN DEFAULT false,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+) ENGINE=InnoDB;
+
+-- Order Shipping
+CREATE TABLE order_shipping (
+    order_shipping_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT,
+    address_id INT,
+    shipping_method VARCHAR(100) NOT NULL,
+    tracking_number VARCHAR(100),
+    FOREIGN KEY (order_id) REFERENCES orders(order_id),
+    FOREIGN KEY (address_id) REFERENCES shipping_addresses(address_id)
+) ENGINE=InnoDB;
+
+-- Indexes for performance
+CREATE INDEX idx_users_tenant_id ON users(tenant_id);
+CREATE INDEX idx_products_tenant_id ON products(tenant_id);
+CREATE INDEX idx_product_prices_product_id ON product_prices(product_id);
+CREATE INDEX idx_product_inventory_product_id ON product_inventory(product_id);
+CREATE INDEX idx_shopping_carts_user_id ON shopping_carts(user_id);
+CREATE INDEX idx_shopping_carts_tenant_id ON shopping_carts(tenant_id);
+CREATE INDEX idx_cart_items_cart_id ON cart_items(cart_id);
+CREATE INDEX idx_orders_user_id ON orders(user_id);
+CREATE INDEX idx_orders_tenant_id ON orders(tenant_id);
+CREATE INDEX idx_order_items_order_id ON order_items(order_id);
+CREATE INDEX idx_shipping_addresses_user_id ON shipping_addresses(user_id);
+
+-- Function to get the current price of a product
+DELIMITER //
+CREATE FUNCTION get_current_product_price(p_product_id INT) 
+RETURNS DECIMAL(10, 2)
+READS SQL DATA
+BEGIN
+    DECLARE current_price DECIMAL(10, 2);
+    SELECT price INTO current_price
+    FROM product_prices
+    WHERE product_id = p_product_id
+    AND effective_from <= CURRENT_TIMESTAMP
+    AND (effective_to IS NULL OR effective_to > CURRENT_TIMESTAMP)
+    ORDER BY effective_from DESC
+    LIMIT 1;
+    RETURN current_price;
+END //
+DELIMITER ;
+
+-- Function to get the current inventory of a product
+DELIMITER //
+CREATE FUNCTION get_current_product_inventory(p_product_id INT) 
+RETURNS INT
+READS SQL DATA
+BEGIN
+    DECLARE current_inventory INT;
+    SELECT stock_quantity INTO current_inventory
+    FROM product_inventory
+    WHERE product_id = p_product_id
+    AND effective_from <= CURRENT_TIMESTAMP
+    AND (effective_to IS NULL OR effective_to > CURRENT_TIMESTAMP)
+    ORDER BY effective_from DESC
+    LIMIT 1;
+    RETURN current_inventory;
+END //
+DELIMITER ;
+
+-- Trigger to update cart item price when adding to cart
+DELIMITER //
+CREATE TRIGGER cart_item_price_update
+BEFORE INSERT ON cart_items
+FOR EACH ROW
+BEGIN
+    SET NEW.price_at_add = get_current_product_price(NEW.product_id);
+END //
+DELIMITER ;
+~~~~
 ---
 
 ## Design Patterns
